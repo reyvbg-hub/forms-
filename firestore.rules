@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Forms collection
+    match /forms/{formId} {
+      function isValidForm(data) {
+        return data.keys().hasAll(['ownerId', 'title', 'status', 'createdAt', 'updatedAt'])
+            && data.ownerId is string && data.ownerId.size() <= 128 && data.ownerId == request.auth.uid
+            && data.title is string && data.title.size() <= 256
+            && data.status in ['draft', 'published']
+            && data.createdAt is number
+            && data.updatedAt is number
+            && (
+              !("theme" in data) || (data.theme is string && data.theme.size() <= 50)
+            )
+            && (
+              !("description" in data) || (data.description is string && data.description.size() <= 1000)
+            )
+            && (
+              !("publishedAt" in data) || (data.publishedAt is number)
+            )
+            && (
+              !("questions" in data) || (data.questions is list && data.questions.size() <= 100)
+            );
+      }
+
+      allow get: if isValidId(formId) && (existing().status == 'published' || (isSignedIn() && existing().ownerId == request.auth.uid));
+      allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+      
+      allow create: if isSignedIn() && isValidId(formId) && isValidForm(incoming());
+      
+      allow update: if isSignedIn() && isValidId(formId) && existing().ownerId == request.auth.uid && isValidForm(incoming()) && incoming().ownerId == existing().ownerId;
+      
+      allow delete: if isSignedIn() && isValidId(formId) && existing().ownerId == request.auth.uid;
+    }
+
+    // Responses collection
+    match /responses/{responseId} {
+      function isValidResponse(data) {
+        return data.keys().hasAll(['formId', 'ownerId', 'submittedAt', 'answers'])
+            && data.formId is string && data.formId.size() <= 128
+            && data.ownerId is string && data.ownerId.size() <= 128
+            && data.submittedAt is number
+            && data.answers is list && data.answers.size() <= 1000;
+      }
+
+      allow read: if isSignedIn() && isValidId(responseId) && existing().ownerId == request.auth.uid;
+      allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+      
+      allow create: if isValidId(responseId) && isValidResponse(incoming()) && exists(/databases/$(database)/documents/forms/$(incoming().formId)) && get(/databases/$(database)/documents/forms/$(incoming().formId)).data.status == 'published' && incoming().ownerId == get(/databases/$(database)/documents/forms/$(incoming().formId)).data.ownerId;
+    }
+  }
+}

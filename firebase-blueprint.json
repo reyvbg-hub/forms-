@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "Form": {
+      "title": "Form",
+      "description": "A form created by a user",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "theme": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "published"]
+        },
+        "questions": {
+          "type": "array"
+        },
+        "createdAt": {
+          "type": "number"
+        },
+        "updatedAt": {
+          "type": "number"
+        },
+        "publishedAt": {
+          "type": "number"
+        }
+      },
+      "required": ["ownerId", "title", "status", "createdAt", "updatedAt"]
+    },
+    "Response": {
+      "title": "Response",
+      "description": "A response to a published form",
+      "type": "object",
+      "properties": {
+        "formId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "submittedAt": {
+          "type": "number"
+        },
+        "answers": {
+          "type": "array"
+        }
+      },
+      "required": ["formId", "ownerId", "submittedAt", "answers"]
+    }
+  },
+  "firestore": {
+    "/forms/{formId}": {
+      "schema": {
+        "$ref": "#/entities/Form"
+      },
+      "description": "User created forms"
+    },
+    "/responses/{responseId}": {
+      "schema": {
+        "$ref": "#/entities/Response"
+      },
+      "description": "Responses submitted for forms"
+    }
+  }
+}

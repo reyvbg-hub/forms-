@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, googleProvider } from './firebase';
-import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser, browserPopupRedirectResolver } from 'firebase/auth';
 
 interface AuthContextType {
   user: FirebaseUser | null;
@@ -26,8 +26,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
+      await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
+    } catch (error: any) {
       console.error('Error signing in with Google:', error);
       throw error;
     }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import { Sparkles, Layout, BarChart, QrCode, Brain, Wand2, ShieldCheck, ArrowRight } from 'lucide-react';
@@ -6,8 +6,10 @@ import { Sparkles, Layout, BarChart, QrCode, Brain, Wand2, ShieldCheck, ArrowRig
 export default function Landing() {
   const { user, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const handleGetStarted = async () => {
+    setAuthError(null);
     if (user) {
       navigate('/dashboard');
     } else {
@@ -16,6 +18,7 @@ export default function Landing() {
         navigate('/dashboard');
       } catch (error) {
         console.error("Login failed", error);
+        setAuthError("Login failed. If you are viewing this inside the AI Studio preview, please open the app in a new tab to sign in.");
       }
     }
   };
@@ -62,6 +65,11 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
+      {authError && (
+        <div className="bg-red-50 text-red-600 p-4 text-center text-sm font-medium border-b border-red-100">
+          {authError}
+        </div>
+      )}
       <section className="pt-24 pb-16 px-4 text-center max-w-5xl mx-auto">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium mb-6">
           <Sparkles className="w-4 h-4" />

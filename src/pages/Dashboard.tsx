@@ -11,6 +11,7 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  writeBatch,
   serverTimestamp,
 } from "firebase/firestore";
 import { Form } from "../types";
@@ -74,7 +75,20 @@ export default function Dashboard() {
   const handleDeleteForm = async (formId: string) => {
     // Removed window.confirm because of iframe restrictions
     try {
-      await deleteDoc(doc(db, "forms", formId));
+      const responsesQ = query(
+        collection(db, "responses"),
+        where("formId", "==", formId)
+      );
+      const responsesSnapshot = await getDocs(responsesQ);
+      
+      const batch = writeBatch(db);
+      responsesSnapshot.docs.forEach((d) => {
+        batch.delete(d.ref);
+      });
+      batch.delete(doc(db, "forms", formId));
+      
+      await batch.commit();
+
       setForms(forms.filter((f) => f.id !== formId));
     } catch (error) {
       console.error("Error deleting form", error);

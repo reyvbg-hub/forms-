@@ -10,7 +10,7 @@ service cloud.firestore {
     }
 
     function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
     }
 
     function incoming() {
@@ -51,7 +51,7 @@ service cloud.firestore {
       
       allow update: if isSignedIn() && isValidId(formId) && existing().ownerId == request.auth.uid && isValidForm(incoming()) && incoming().ownerId == existing().ownerId;
       
-      allow delete: if isSignedIn() && isValidId(formId) && existing().ownerId == request.auth.uid;
+      allow delete: if isSignedIn() && existing().ownerId == request.auth.uid;
     }
 
     // Responses collection
@@ -68,6 +68,7 @@ service cloud.firestore {
       allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
       
       allow create: if isValidId(responseId) && isValidResponse(incoming()) && exists(/databases/$(database)/documents/forms/$(incoming().formId)) && get(/databases/$(database)/documents/forms/$(incoming().formId)).data.status == 'published' && incoming().ownerId == get(/databases/$(database)/documents/forms/$(incoming().formId)).data.ownerId;
+      allow delete: if isSignedIn() && existing().ownerId == request.auth.uid;
     }
   }
 }

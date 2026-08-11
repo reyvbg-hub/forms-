@@ -16,3 +16,6 @@ export const auth = getAuth(app);
 // Assuming you created the db explicitly.
 export const db = getFirestore(app, "ai-studio-bbc2e923-809f-4cc0-8ae0-0553a58f43f0");
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});

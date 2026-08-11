@@ -1,1 +1,0 @@
-{"functions":[{"bundler":"esbuild","buildData":{"runtimeAPIVersion":1},"mainFile":"/app/applet/netlify/functions/api.ts","name":"api","priority":10,"runtimeVersion":"nodejs22.x","path":"/app/applet/.netlify/functions/api.zip","runtime":"js"}],"system":{"arch":"x64","platform":"linux"},"timestamp":1786442463842,"version":1}

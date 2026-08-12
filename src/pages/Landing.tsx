@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
+import { auth } from '../lib/firebase';
 import { Sparkles, Layout, BarChart, QrCode, Brain, Wand2, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export default function Landing() {
@@ -10,15 +11,23 @@ export default function Landing() {
 
   const handleGetStarted = async () => {
     setAuthError(null);
-    if (user) {
+    if (user || auth.currentUser) {
       navigate('/dashboard');
     } else {
       try {
         await signInWithGoogle();
-        navigate('/dashboard');
-      } catch (error) {
+        if (auth.currentUser) {
+          navigate('/dashboard');
+        }
+      } catch (error: any) {
+        if (
+          error?.code === 'auth/popup-closed-by-user' ||
+          error?.code === 'auth/cancelled-popup-request'
+        ) {
+          return;
+        }
         console.error("Login failed", error);
-        setAuthError("Google Sign-In requires third-party cookies or an authorized domain. Please use 'Continue as Guest' below instead.");
+        setAuthError("Google Sign-In failed. You can also use 'Continue as Guest' below to start immediately.");
       }
     }
   };

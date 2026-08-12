@@ -23,7 +23,7 @@ router.post("/generate-form", async (req, res) => {
     }
 
     const response = await getAI().models.generateContent({
-      model: "gemini-pro-latest",
+      model: "gemini-flash-latest",
       contents: `You are an expert form creator. Given the user prompt, generate a structured form in JSON format.
       
       User prompt: ${prompt}
@@ -77,7 +77,7 @@ router.post("/analyze-responses", async (req, res) => {
     }
 
     const response = await getAI().models.generateContent({
-      model: "gemini-pro-latest",
+      model: "gemini-flash-latest",
       contents: `You are a data analyst. Analyze these form responses and provide insights.
       
       Form definition: ${JSON.stringify(form)}
@@ -122,7 +122,7 @@ router.post("/generate-templates", async (req, res) => {
     const promptTopic = topic || "general business and personal use";
 
     const response = await getAI().models.generateContent({
-      model: "gemini-pro-latest",
+      model: "gemini-flash-latest",
       contents: `You are an expert form creator. Generate 6 form template ideas for: ${promptTopic}.
       
       Output a JSON array of objects with this exact structure:

@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, googleProvider } from './firebase';
-import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser, browserPopupRedirectResolver } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser, browserPopupRedirectResolver, signInAnonymously as firebaseSignInAnonymously } from 'firebase/auth';
 
 interface AuthContextType {
   user: FirebaseUser | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInAnonymously: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -33,6 +34,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signInAnonymously = async () => {
+    try {
+      await firebaseSignInAnonymously(auth);
+    } catch (error: any) {
+      console.error('Error signing in anonymously:', error);
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
@@ -43,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInAnonymously, signOut }}>
       {children}
     </AuthContext.Provider>
   );

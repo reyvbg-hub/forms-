@@ -4,7 +4,7 @@ import { useAuth } from '../lib/AuthContext';
 import { Sparkles, Layout, BarChart, QrCode, Brain, Wand2, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export default function Landing() {
-  const { user, signInWithGoogle } = useAuth();
+  const { user, signInWithGoogle, signInAnonymously } = useAuth();
   const navigate = useNavigate();
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -18,7 +18,7 @@ export default function Landing() {
         navigate('/dashboard');
       } catch (error) {
         console.error("Login failed", error);
-        setAuthError("Login failed. If you are viewing this inside the AI Studio preview, please open the app in a new tab to sign in.");
+        setAuthError("Google Sign-In requires third-party cookies or an authorized domain. Please use 'Continue as Guest' below instead.");
       }
     }
   };
@@ -82,11 +82,23 @@ export default function Landing() {
           Create beautiful, intelligent forms in seconds using AI. Just tell FormForge what you need, and we'll generate a complete, ready-to-publish form instantly.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          
           <button 
-            onClick={handleGetStarted}
+             onClick={handleGetStarted}
             className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
           >
-            Create a Form <ArrowRight className="w-5 h-5" />
+            Sign in with Google <ArrowRight className="w-5 h-5" />
+          </button>
+          <button 
+             onClick={async () => { 
+               try {
+                 await signInAnonymously();
+                 navigate('/dashboard');
+               } catch(e) { console.error(e); } 
+             }}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-full text-lg font-semibold transition-all shadow-sm hover:-translate-y-0.5"
+          >
+            Continue as Guest
           </button>
         </div>
 
@@ -161,12 +173,27 @@ export default function Landing() {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl font-bold text-white mb-6">Ready to collect better data?</h2>
           <p className="text-slate-300 mb-10 text-lg">Join thousands of users building smarter forms with AI.</p>
-          <button 
-            onClick={handleGetStarted}
-            className="bg-white hover:bg-slate-100 text-slate-900 px-8 py-4 rounded-full text-lg font-semibold transition-colors shadow-lg"
-          >
-            Create your first form in seconds
-          </button>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button 
+              onClick={handleGetStarted}
+              className="bg-white hover:bg-slate-100 text-slate-900 px-8 py-4 rounded-full text-lg font-semibold transition-colors shadow-lg"
+            >
+              Sign in with Google
+            </button>
+            <button 
+              onClick={async () => { 
+                try {
+                  await signInAnonymously();
+                  navigate('/dashboard');
+                } catch(e) { console.error(e); } 
+              }}
+              className="bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 px-8 py-4 rounded-full text-lg font-semibold transition-colors shadow-lg"
+            >
+              Continue as Guest
+            </button>
+          </div>
+
         </div>
       </section>
     </div>
